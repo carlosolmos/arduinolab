@@ -134,28 +134,34 @@ void loop() {
         freewheel();  // see if we can implment faster stop
         
         // look left
+        Serial.print("LOOK LEFT\n");
         servo_position(LEFT);  
         float distanceLeft = ping();
         
         // look right
+        Serial.print("LOOK RIGHT\n");
         servo_position(RIGHT);  
         float distanceRight = ping();
         
         // re-center the ultrasonic
+        Serial.print("LOOK CENTER\n");
         servo_position(CENTER);
         
         // go the least obstructed way
                
         if (distanceLeft > distanceRight && distanceLeft > dangerThreshold)       //if left is less obstructed 
         {
+            Serial.print("GO LEFT\n");
             rotate_left();
         }
         else if (distanceRight > distanceLeft && distanceRight > dangerThreshold) //if right is less obstructed 
         {
+           Serial.print("GO RIGHT\n");
            rotate_right();
         }
         else // equally blocked or less than danger threshold left or right
         {
+            Serial.print("UTURN\n");
             u_turn();
         }       
     }

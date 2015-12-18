@@ -1,3 +1,14 @@
+// Servo
+
+#include <Servo.h> 
+
+#define LEFT 180
+#define CENTER 90
+#define RIGHT 0
+
+Servo ultrasonicServo;  // create servo object to control a servo 
+ 
+int currentPos = 0;    // variable to store the servo position 
 
 // Motors
 #include <AFMotor.h>
@@ -22,12 +33,11 @@ void setup() {
     Serial.begin(9600);           // set up Serial library at 9600 bps
     Serial.println("Motor test!");
   
-    // setup motor
-    motor1.setSpeed(SLOW);
-    motor2.setSpeed(SLOW);
+    // setup servo
+    ultrasonicServo.attach(10,650,1075);  // attaches the servo on pin 5 to the servo object
    
-    motor1.run(RELEASE);
-    motor2.run(RELEASE);    
+    // move servo to center 
+    servo_position(CENTER);  
 
 }
 
@@ -41,21 +51,17 @@ void setup() {
 
 void loop() {
     
-                
-        drive_forward();
+        Serial.println("CENTER!\n");
+        servo_position(CENTER);
         delay(2000);
-        brake();
-
-        u_turn();
-        brake();
+  
+        Serial.println("LEFT!\n");
+        servo_position(LEFT);
         delay(2000);
         
-        
-        drive_forward();
+        Serial.println("RIGHT!\n");
+        servo_position(RIGHT);
         delay(2000);
-        brake();
-        
-       
     
 }
 
@@ -112,7 +118,10 @@ void u_turn(){
     delay(700); // twice as long as rotate right to end up 180 degrees around
 }
 
-
+void servo_position(int newPos){
+  ultrasonicServo.write(newPos);
+  delay(800);
+}
 
 
 
