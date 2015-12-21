@@ -60,12 +60,8 @@ void setup() {
 void loop() {
 
     if(flag == 0){
-      Serial.print("Center");
-      flag = 1;
-      //test sweep
-      bestPos = servo_180();
-      delay(25);
-      servo_180();
+      flag = 1;      
+      bestPos = servo_sweep();
     }
 
     
@@ -77,13 +73,77 @@ void loop() {
 // servo control
 
 
-void servo_180(){
+int servo_180(){
    Serial.print("doing a 180 from ");
    int currentPos = theServo.read();
 
    int bestAngle = 90; //front.
    int bestDistance = 0;
    
+   Serial.print(currentPos);
+   Serial.print("\n");
+   
+   int startingPos = 0;
+   int increment = 1;
+   
+   if(currentPos <= 90){
+     startingPos = 0;
+     increment = 1;
+   }else{
+     startingPos = 180;
+     increment = -1;
+   }
+
+  Serial.print("Starting pos ");
+  Serial.print(startingPos);
+  Serial.print("\n");
+  
+  //go to starting pos
+  theServo.write(startingPos); 
+  delay(25);
+
+  int endPos = startingPos + (increment * 70);
+  int pos = startingPos;
+
+  Serial.print("End pos ");
+  Serial.print(endPos);
+  Serial.print("\n");
+  
+  while(pos != endPos){
+    Serial.print("pos ");
+    Serial.print(pos);
+    Serial.print("\n");
+    
+    float distance = ping();
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.print("\n");
+    if(distance > bestDistance){
+      bestDistance = distance;
+      bestAngle = pos;
+      Serial.print("best\n");
+    }
+    theServo.write(pos); // tell servo to go to position in variable 'pos' 
+    pos = pos + increment; // in steps of 1 degree 
+    delay(30); // waits 15ms for the servo to reach the position 
+      
+  }
+  Serial.print("Best pos: ");
+  Serial.print(bestAngle);
+  Serial.print("\nBest distance: ");
+  Serial.print(bestDistance);
+  Serial.print("\n");
+
+  return bestAngle;
+}
+
+
+int servo_sweep(){
+   int bestAngle = 90; //front.
+   int bestDistance = 0;
+
+   Serial.print("doing a sweep from ");
+   int currentPos = theServo.read();   
    Serial.print(currentPos);
    Serial.print("\n");
    
@@ -127,11 +187,23 @@ void servo_180(){
       bestAngle = pos;
       Serial.print("best\n");
     }
+    
+    if(pos == 70 && increment == 1){
+      pos = 110;  
+      servo_position(pos);
+    }
+    
+    if(pos == 110 && increment == -1){
+      pos = 70; 
+      servo_position(pos);
+    }
+    
     theServo.write(pos); // tell servo to go to position in variable 'pos' 
     pos = pos + increment; // in steps of 1 degree 
     delay(30); // waits 15ms for the servo to reach the position 
       
   }
+  
   Serial.print("Best pos: ");
   Serial.print(bestAngle);
   Serial.print("\nBest distance: ");
@@ -139,22 +211,6 @@ void servo_180(){
   Serial.print("\n");
 
   return bestAngle;
-}
-
-
-//sweep from 0 to newPos
-void servo_sweep(int newPos){
-    if(newPos < 0)
-      newPos = 0;
-      
-    if(newPos > 180)
-      newPos = 180;
-        
-    for(int pos=0; pos < newPos; pos += 1)  // goes from 0 degrees to 180 degrees 
-    {                                                // in steps of 1 degree 
-        theServo.write(pos);                  // tell servo to go to position in variable 'pos' 
-        delay(15);                                   // waits 15ms for the servo to reach the position 
-    }  
 }
 
 //go to position
